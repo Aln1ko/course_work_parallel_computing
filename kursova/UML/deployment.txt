@@ -1,0 +1,25 @@
+@startuml
+node "Client Machine" {
+    [Web Browser] 
+}
+
+node "Server Machine" {
+    [Web Server] 
+    [Thread Pool]
+    [Inverted Index]
+}
+
+node "Admin Machine" {
+    [Admin Client]
+}
+
+node "Database Server" {
+    [File Storage] 
+    [Index Database]
+}
+
+"Client Machine" --> "Server Machine": HTTP Requests (Search)
+"Admin Machine" --> "Server Machine": HTTP Requests (Upload/Update)
+
+"Server Machine" --> "Database Server": Access Files and Data
+@enduml
