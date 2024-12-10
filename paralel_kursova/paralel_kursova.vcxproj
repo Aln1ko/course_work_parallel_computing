@@ -148,10 +148,12 @@
     <ClCompile Include="FileFinder.cpp" />
     <ClCompile Include="InvertedIndex.cpp" />
     <ClCompile Include="paralel_kursova.cpp" />
+    <ClCompile Include="server.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FileFinder.h" />
     <ClInclude Include="InvertedIndex.h" />
+    <ClInclude Include="server.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
