@@ -149,11 +149,15 @@
     <ClCompile Include="InvertedIndex.cpp" />
     <ClCompile Include="paralel_kursova.cpp" />
     <ClCompile Include="server.cpp" />
+    <ClCompile Include="ThreadPool.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FileFinder.h" />
     <ClInclude Include="InvertedIndex.h" />
+    <ClInclude Include="MyQueue.h" />
     <ClInclude Include="server.h" />
+    <ClInclude Include="Task.h" />
+    <ClInclude Include="ThreadPool.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

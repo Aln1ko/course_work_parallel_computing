@@ -60,7 +60,12 @@ void Server::start()
         }
         std::cout << "Client connected: " << inet_ntoa(client_addr.sin_addr)
             << ":" << ntohs(client_addr.sin_port) << std::endl;
-        
+        //
+        std::thread clientThread(&Server::handleClient, this, client_socket);
+        clientThread.detach();
+        //threads.push_back(handleClient, client_socket);
+        //
+
     }
 }
 
@@ -71,5 +76,20 @@ Server::~Server()
 
 void Server::handleClient(SOCKET client_socket)
 {
+    char buffer[1024] = { 0 };
+    int bytesReceived = recv(client_socket, buffer, buffer_size, 0);
+    if (bytesReceived > 0) {
+        std::cout << "Получено сообщение: " << buffer << std::endl;
+    }
+    else {
+        std::cerr << "Ошибка получения данных: " << WSAGetLastError() << std::endl;
+    }
 
+    // Отправка ответа клиенту
+    const char* message = "Привет от сервера!";
+    send(client_socket, message, strlen(message), 0);
+    std::cout << "Сообщение отправлено клиенту" << std::endl;
+
+    // Закрытие сокетов
+    closesocket(client_socket);
 }

@@ -11,10 +11,9 @@ public:
 	std::condition_variable con_var;
 
 	void push(Task t) {
-		mtx.lock();
+		std::lock_guard<std::mutex> lock(mtx);
 		q.push(t);
 		con_var.notify_one();
-		mtx.unlock();
 	}
 
 	Task front_and_pop() {
@@ -22,7 +21,12 @@ public:
 		q.pop();
 		return t;
 	}
+
 	bool empty() {
 		return q.empty();
 	}
+	std::mutex& get_mut() {
+		return mtx;
+	}
+
 };
