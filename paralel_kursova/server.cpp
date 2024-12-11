@@ -1,8 +1,7 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
-#include <iostream>
-#include <winsock2.h>
-#pragma comment(lib,"ws2_32.lib")
 #include "server.h"
+#pragma comment(lib,"ws2_32.lib")
+
 
 Server::Server(int port) : port(port) {
     setlocale(LC_ALL, "");
@@ -61,7 +60,7 @@ void Server::start()
         }
         std::cout << "Client connected: " << inet_ntoa(client_addr.sin_addr)
             << ":" << ntohs(client_addr.sin_port) << std::endl;
-
+        
     }
 }
 
