@@ -46,7 +46,7 @@ Server::Server(int port) : port(port) {
     std::cout << "Waiting for connection on port " << port << "..." << std::endl;
 }
 
-void Server::start(MyQueue& q)
+void Server::start(MyQueue& q, InvertedIndex& in_index)
 {
     while (true) {
         SOCKET client_socket;
@@ -61,7 +61,7 @@ void Server::start(MyQueue& q)
         std::cout << "Client connected: " << inet_ntoa(client_addr.sin_addr)
             << ":" << ntohs(client_addr.sin_port) << std::endl;
 
-        Task t(client_socket, [this](SOCKET soc) {this->handle_client(soc); });
+        Task t(client_socket, [this,&in_index](SOCKET soc) {this->handle_client(soc, in_index); });
         q.push(t);
     }
 }
@@ -71,7 +71,7 @@ Server::~Server()
     closesocket(server_socket);
 }
 
-void Server::handle_client(SOCKET client_socket)
+void Server::handle_client(SOCKET client_socket, InvertedIndex& in_index)
 {
     char buffer[1024] = { 0 };
     int bytesReceived = recv(client_socket, buffer, buffer_size, 0);
@@ -81,10 +81,16 @@ void Server::handle_client(SOCKET client_socket)
     else {
         std::cerr << "Ошибка получения данных: " << WSAGetLastError() << std::endl;
     }
-
+    std::vector<std::string> arr = in_index.find_index(buffer);
+    std::string answer = "";
+    for (auto& str : arr) {
+        answer += str;
+        answer += ",";
+    }
     // Отправка ответа клиенту
-    const char* message = "Привет от сервера!";
-    send(client_socket, message, strlen(message), 0);
+    const char* message = answer.c_str();
+    char test[10000] = {  };
+    send(client_socket, test, strlen(test), 0);
     std::cout << "Сообщение отправлено клиенту" << std::endl;
 
     // Закрытие сокетов
