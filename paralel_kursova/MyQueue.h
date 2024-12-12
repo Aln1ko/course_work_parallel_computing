@@ -11,8 +11,9 @@ public:
 	std::condition_variable con_var;
 
 	void push(Task t) {
-		std::lock_guard<std::mutex> lock(mtx);
+		std::unique_lock<std::mutex> lock(mtx);
 		q.push(t);
+		lock.unlock();
 		con_var.notify_one();
 	}
 
@@ -27,6 +28,9 @@ public:
 	}
 	std::mutex& get_mut() {
 		return mtx;
+	}
+	int size() {
+		return q.size();
 	}
 
 };

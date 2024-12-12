@@ -46,7 +46,7 @@ Server::Server(int port) : port(port) {
     std::cout << "Waiting for connection on port " << port << "..." << std::endl;
 }
 
-void Server::start() 
+void Server::start(MyQueue& q)
 {
     while (true) {
         SOCKET client_socket;
@@ -60,12 +60,9 @@ void Server::start()
         }
         std::cout << "Client connected: " << inet_ntoa(client_addr.sin_addr)
             << ":" << ntohs(client_addr.sin_port) << std::endl;
-        //
-        std::thread clientThread(&Server::handleClient, this, client_socket);
-        clientThread.detach();
-        //threads.push_back(handleClient, client_socket);
-        //
 
+        Task t(client_socket, [this](SOCKET soc) {this->handle_client(soc); });
+        q.push(t);
     }
 }
 
@@ -74,7 +71,7 @@ Server::~Server()
     closesocket(server_socket);
 }
 
-void Server::handleClient(SOCKET client_socket)
+void Server::handle_client(SOCKET client_socket)
 {
     char buffer[1024] = { 0 };
     int bytesReceived = recv(client_socket, buffer, buffer_size, 0);

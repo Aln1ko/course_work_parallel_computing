@@ -2,6 +2,7 @@
 #include "InvertedIndex.h"
 #include "FileFinder.h"
 #include "server.h"
+#include "ThreadPool.h"
 #include <chrono>
 
 
@@ -38,9 +39,12 @@ int main()
 	//end_time = std::chrono::high_resolution_clock::now();
 	//duration = end_time - start_time;
 	//std::cout << "Time execution: " << duration.count() << " seconds" << std::endl;
-
+	MyQueue q;
+	ThreadPool tp(4,q);
+	tp.inizialize();
 	Server s = Server(8080);
-	s.start();
+	s.start(q);
+	
 
 	return 0;
 }
