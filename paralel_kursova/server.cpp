@@ -73,7 +73,7 @@ Server::~Server()
 
 void Server::handle_client(SOCKET client_socket, InvertedIndex& in_index)
 {
-    char buffer[1024] = { 0 };
+    char buffer[2048] = { 0 };
     int bytesReceived = recv(client_socket, buffer, buffer_size, 0);
     if (bytesReceived > 0) {
         std::cout << "Получено сообщение: " << buffer << std::endl;
@@ -85,12 +85,12 @@ void Server::handle_client(SOCKET client_socket, InvertedIndex& in_index)
     std::string answer = "";
     for (auto& str : arr) {
         answer += str;
-        answer += ",";
+        answer += ", ";
     }
     // Отправка ответа клиенту
     const char* message = answer.c_str();
-    char test[10000] = {  };
-    send(client_socket, test, strlen(test), 0);
+    //char test[10000] = {  };
+    send(client_socket, message, sizeof(message), 0);
     std::cout << "Сообщение отправлено клиенту" << std::endl;
 
     // Закрытие сокетов

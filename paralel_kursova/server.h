@@ -14,7 +14,7 @@ public:
 private:
 	SOCKET server_socket;
 	int port;
-	const int buffer_size = 1024;
+	const int buffer_size = 2048;
 	sockaddr_in server_addr;
 	void handle_client(SOCKET client_socket, InvertedIndex& in_index);
 
