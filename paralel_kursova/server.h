@@ -18,5 +18,4 @@ private:
 	const int buffer_size = 2048;
 	sockaddr_in server_addr;
 	void handle_client(SOCKET client_socket, InvertedIndex& in_index);
-
 };

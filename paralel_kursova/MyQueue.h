@@ -29,7 +29,7 @@ public:
 	std::mutex& get_mut() {
 		return mtx;
 	}
-	int size() {
+	size_t size() {
 		return q.size();
 	}
 

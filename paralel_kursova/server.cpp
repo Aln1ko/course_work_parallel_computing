@@ -82,24 +82,14 @@ void Server::handle_client(SOCKET client_socket, InvertedIndex& in_index)
         std::cerr << "Error obtaining data: " << WSAGetLastError() << std::endl;
     }
 
-    std::vector<std::string> arr = in_index.find_index(buffer);
-    std::string answer = "";
-    for (auto& str : arr) {
-        answer += str;
-        answer += ", ";
-    }
     // Отправка ответа клиенту
-    //const char* message = answer.c_str();
-
     const char* message = "Hello from server";
-    //char test[10000] = {  };
     send(client_socket, message, sizeof(message), 0);
     std::cout << "Message sent to client" << std::endl;
 
-
     while (true)
     {
-        int bytes_recv = recv(client_socket,buffer,sizeof(buffer),0);
+        int bytes_recv = recv(client_socket, buffer, sizeof(buffer) - 1, 0);
         if (bytes_recv == 0) {
             // Клиент закрыл соединение
             std::cout << "Client disconnected." << std::endl;
@@ -109,6 +99,7 @@ void Server::handle_client(SOCKET client_socket, InvertedIndex& in_index)
             std::cerr << "Error receiving data: " << WSAGetLastError() << std::endl;
             break;
         }
+
         buffer[bytes_recv] = '\0';
 
         std::string buffer_str(buffer);
@@ -116,16 +107,31 @@ void Server::handle_client(SOCKET client_socket, InvertedIndex& in_index)
         std::string action;
         iss >> action;
 
+        
         if (action == "quit") {
             std::cout << "Quit command received, end of connection" << std::endl;
             break;
         }
-        else if (action == "find") {
 
+        else if (action == "find") {
+            std::string word;
+            iss >> word;
+            std::transform(word.begin(), word.end(), word.begin(), 
+                [](unsigned char c) {return std::tolower(c);});
+
+            std::vector<std::string> arr = in_index.find_index(word);
+            std::string answer = "";
+            for (auto& str : arr) {
+                answer += str;
+                answer += ", ";
+            }
+            send(client_socket, answer.c_str(),sizeof(answer),0);
         }
+
         else if (action == "update") {
 
         }
+
         else {
             std::string response = "Unknowen command";
             send(client_socket, response.c_str(), sizeof(response), 0);
