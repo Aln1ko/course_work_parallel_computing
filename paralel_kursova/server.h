@@ -5,6 +5,7 @@
 #include <vector>
 #include "MyQueue.h"
 #include "InvertedIndex.h"
+#include <sstream>
 
 class Server {
 public:
