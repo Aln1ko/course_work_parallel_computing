@@ -44,7 +44,7 @@ int main()
 	ThreadPool tp(4,q);
 	tp.inizialize();
 	Server s = Server(8080);
-	s.start(q, in_index);
+	s.start(q, in_index, file_f);
 	
 
 	return 0;

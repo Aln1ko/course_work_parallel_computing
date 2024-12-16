@@ -46,7 +46,7 @@ Server::Server(int port) : port(port) {
     std::cout << "Waiting for connection on port " << port << "..." << std::endl;
 }
 
-void Server::start(MyQueue& q, InvertedIndex& in_index)
+void Server::start(MyQueue& q, InvertedIndex& in_index, FileFinder& file_f)
 {
     while (true) {
         SOCKET client_socket;
@@ -61,7 +61,7 @@ void Server::start(MyQueue& q, InvertedIndex& in_index)
         std::cout << "Client connected: " << inet_ntoa(client_addr.sin_addr)
             << ":" << ntohs(client_addr.sin_port) << std::endl;
 
-        Task t(client_socket, [this,&in_index](SOCKET soc) {this->handle_client(soc, in_index); });
+        Task t(client_socket, [this,&in_index,&file_f](SOCKET soc) {this->handle_client(soc, in_index,file_f); });
         q.push(t);
     }
 }
@@ -71,7 +71,13 @@ Server::~Server()
     closesocket(server_socket);
 }
 
-void Server::handle_client(SOCKET client_socket, InvertedIndex& in_index)
+bool is_number(const std::string& str) {
+    if (str.empty()) return false;
+    size_t start = (str[0] == '-' || str[0] == '+') ? 1 : 0;
+    return std::all_of(str.begin() + start, str.end(), ::isdigit);
+}
+
+void Server::handle_client(SOCKET client_socket, InvertedIndex& in_index, FileFinder& file_f)
 {
     char buffer[2048] = { 0 };
     int bytesReceived = recv(client_socket, buffer, buffer_size, 0);
@@ -82,10 +88,19 @@ void Server::handle_client(SOCKET client_socket, InvertedIndex& in_index)
         std::cerr << "Error obtaining data: " << WSAGetLastError() << std::endl;
     }
 
+
     // Отправка ответа клиенту
-    const char* message = "Hello from server";
-    send(client_socket, message, sizeof(message), 0);
+    std::string  message = "Hello from server";
+    send(client_socket, message.c_str(), sizeof(message), 0);
     std::cout << "Message sent to client" << std::endl;
+
+    for (size_t i = 0; i < sizeof(buffer); ++i) {
+        buffer[i] = 0;
+    }
+
+   /* std::vector<std::string> pathes{ "C:\\Users\\RT\\Desktop\\7semestr\\aclImdb\\test\\neg" };
+    std::vector<std::string> files = file_f.find_files(pathes, 0, 1000, 0, 1000);
+    in_index.create_index(files);*/
 
     while (true)
     {
@@ -99,14 +114,16 @@ void Server::handle_client(SOCKET client_socket, InvertedIndex& in_index)
             std::cerr << "Error receiving data: " << WSAGetLastError() << std::endl;
             break;
         }
-
-        buffer[bytes_recv] = '\0';
+        if (bytes_recv > 0) {
+            buffer[bytes_recv] = '\0';
+            std::cout << "Запрос клиента: " << buffer << std::endl;
+        }
 
         std::string buffer_str(buffer);
         std::istringstream iss(buffer_str);
         std::string action;
         iss >> action;
-
+        //std::cout << "action is " << action << std::endl;
         
         if (action == "quit") {
             std::cout << "Quit command received, end of connection" << std::endl;
@@ -116,20 +133,49 @@ void Server::handle_client(SOCKET client_socket, InvertedIndex& in_index)
         else if (action == "find") {
             std::string word;
             iss >> word;
+            std::cout << "word is " << word << std::endl;
             std::transform(word.begin(), word.end(), word.begin(), 
                 [](unsigned char c) {return std::tolower(c);});
 
             std::vector<std::string> arr = in_index.find_index(word);
             std::string answer = "";
-            for (auto& str : arr) {
-                answer += str;
-                answer += ", ";
+            for (int i = 0; i < arr.size();i ++) {
+                answer += arr[i];
+                if (i != arr.size() - 1) {
+                    answer += ", ";
+                }
             }
-            send(client_socket, answer.c_str(),sizeof(answer),0);
+            /*std::cout << "answer is " << answer << std::endl;
+            std::cout << "answer2 is " << answer.c_str() << std::endl;
+            std::cout << "sizeof buffer: " << sizeof(answer.c_str()) <<"  "<<answer.length() << std::endl;
+            */
+            send(client_socket, answer.c_str(),answer.length(),0);
         }
 
         else if (action == "update") {
+            std::string folder, num1_str, num2_str;
 
+            if (iss >> num1_str && !is_number(num1_str)) {
+                folder = num1_str;
+                num1_str = "0";  // Стандартное значение, если это не число
+                num2_str = "1000";
+            }
+            else if (iss >> num2_str && !is_number(num2_str)) {
+                num2_str = "1000";
+                folder = num2_str;
+            }
+            else {
+                iss >> folder;
+            }
+
+            int num1 = std::stoi(num1_str);
+            int num2 = std::stoi(num2_str);
+            std::vector<std::string> folders{folder};
+         
+            std::vector<std::string> files = file_f.find_files(folders, num1, num2, num1, num2);
+            in_index.create_index(files);
+            std::string response = "Update done";
+            send(client_socket, response.c_str(), sizeof(response), 0);
         }
 
         else {
@@ -137,8 +183,13 @@ void Server::handle_client(SOCKET client_socket, InvertedIndex& in_index)
             send(client_socket, response.c_str(), sizeof(response), 0);
         }
 
+        for (size_t i = 0; i < sizeof(buffer); ++i) {
+            buffer[i] = 0;
+        }
+
     }
 
     // Закрытие сокетов
     closesocket(client_socket);
 }
+

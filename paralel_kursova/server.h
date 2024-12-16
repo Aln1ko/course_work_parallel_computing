@@ -5,17 +5,18 @@
 #include <vector>
 #include "MyQueue.h"
 #include "InvertedIndex.h"
+#include "FileFinder.h"
 #include <sstream>
 
 class Server {
 public:
 	Server(int port);
-	void start(MyQueue& q,InvertedIndex& in_index);
+	void start(MyQueue& q,InvertedIndex& in_index, FileFinder& file_f);
 	~Server();
 private:
 	SOCKET server_socket;
 	int port;
 	const int buffer_size = 2048;
 	sockaddr_in server_addr;
-	void handle_client(SOCKET client_socket, InvertedIndex& in_index);
+	void handle_client(SOCKET client_socket, InvertedIndex& in_index, FileFinder& file_f);
 };
