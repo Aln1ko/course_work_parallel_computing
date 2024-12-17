@@ -80,23 +80,23 @@ bool is_number(const std::string& str) {
 void Server::handle_client(SOCKET client_socket, InvertedIndex& in_index, FileFinder& file_f)
 {
     char buffer[2048] = { 0 };
-    int bytesReceived = recv(client_socket, buffer, buffer_size, 0);
-    if (bytesReceived > 0) {
-        std::cout << "Obtained message: " << buffer << std::endl;
-    }
-    else {
-        std::cerr << "Error obtaining data: " << WSAGetLastError() << std::endl;
-    }
+    //int bytesReceived = recv(client_socket, buffer, buffer_size, 0);
+    //if (bytesReceived > 0) {
+    //    std::cout << "Obtained message: " << buffer << std::endl;
+    //}
+    //else {
+    //    std::cerr << "Error obtaining data: " << WSAGetLastError() << std::endl;
+    //}
 
 
-    // Отправка ответа клиенту
-    std::string  message = "Hello from server";
-    send(client_socket, message.c_str(), sizeof(message), 0);
-    std::cout << "Message sent to client" << std::endl;
+    //// Отправка ответа клиенту
+    //std::string  message = "Hello from server";
+    //send(client_socket, message.c_str(), message.length(), 0);
+    //std::cout << "Message sent to client" << std::endl;
 
-    for (size_t i = 0; i < sizeof(buffer); ++i) {
-        buffer[i] = 0;
-    }
+    //for (size_t i = 0; i < sizeof(buffer); ++i) {
+    //    buffer[i] = 0;
+    //}
 
    /* std::vector<std::string> pathes{ "C:\\Users\\RT\\Desktop\\7semestr\\aclImdb\\test\\neg" };
     std::vector<std::string> files = file_f.find_files(pathes, 0, 1000, 0, 1000);
@@ -175,7 +175,7 @@ void Server::handle_client(SOCKET client_socket, InvertedIndex& in_index, FileFi
             std::vector<std::string> files = file_f.find_files(folders, num1, num2, num1, num2);
             in_index.create_index(files);
             std::string response = "Update done";
-            send(client_socket, response.c_str(), sizeof(response), 0);
+            send(client_socket, response.c_str(), response.length(), 0);
         }
 
         else {
