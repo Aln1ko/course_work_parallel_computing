@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <mutex>
 #include <iostream>
+#include "MyQueue.h"
 
 class InvertedIndex
 {
@@ -16,6 +17,8 @@ public:
 	InvertedIndex();
 
 	void create_index(std::vector<std::string> files);
+	void create_index1(std::vector<std::string> files, MyQueue& q);
+
 	void add_index_1file(const std::string& path);
 	void update_index(std::vector<std::string> files);
 	std::vector<std::string> find_index(std::string word);

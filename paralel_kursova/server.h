@@ -11,12 +11,12 @@
 class Server {
 public:
 	Server(int port);
-	void start(MyQueue& q,InvertedIndex& in_index, FileFinder& file_f);
+	void start(MyQueue& q,InvertedIndex& in_index, FileFinder& file_f, MyQueue& q_index);
 	~Server();
 private:
 	SOCKET server_socket;
 	int port;
 	const int buffer_size = 2048;
 	sockaddr_in server_addr;
-	void handle_client(SOCKET client_socket, InvertedIndex& in_index, FileFinder& file_f);
+	void handle_client(std::string str, InvertedIndex& in_index, FileFinder& file_f, MyQueue& q_index);
 };

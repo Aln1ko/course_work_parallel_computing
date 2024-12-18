@@ -12,7 +12,7 @@ class ThreadPool {
 	bool finished = false;
 	bool paused = false;
 	std::mutex m_status;
-
+	bool working_to_the_end = false;
 	void consume();
 
 public:
@@ -22,5 +22,7 @@ public:
 	void finish();
 	void pause();
 	void resume();
+	void working_to_the_end_finish();
+	int get_size_q();
 
 };

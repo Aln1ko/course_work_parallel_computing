@@ -46,7 +46,7 @@ Server::Server(int port) : port(port) {
     std::cout << "Waiting for connection on port " << port << "..." << std::endl;
 }
 
-void Server::start(MyQueue& q, InvertedIndex& in_index, FileFinder& file_f)
+void Server::start(MyQueue& q, InvertedIndex& in_index, FileFinder& file_f, MyQueue& q_index)
 {
     while (true) {
         SOCKET client_socket;
@@ -61,7 +61,9 @@ void Server::start(MyQueue& q, InvertedIndex& in_index, FileFinder& file_f)
         std::cout << "Client connected: " << inet_ntoa(client_addr.sin_addr)
             << ":" << ntohs(client_addr.sin_port) << std::endl;
 
-        Task t(client_socket, [this,&in_index,&file_f](SOCKET soc) {this->handle_client(soc, in_index,file_f); });
+        //Task t(client_socket, [this,&in_index,&file_f](SOCKET soc) {this->handle_client(soc, in_index,file_f); });
+        std::string str = std::to_string(client_socket);
+        Task t(str, [this, &in_index, &file_f,&q_index](std::string str) {this->handle_client(str, in_index, file_f, q_index); });
         q.push(t);
     }
 }
@@ -77,8 +79,9 @@ bool is_number(const std::string& str) {
     return std::all_of(str.begin() + start, str.end(), ::isdigit);
 }
 
-void Server::handle_client(SOCKET client_socket, InvertedIndex& in_index, FileFinder& file_f)
+void Server::handle_client(std::string str, InvertedIndex& in_index, FileFinder& file_f, MyQueue& q_index)
 {
+    int client_socket = stoi(str);
     char buffer[2048] = { 0 };
     //int bytesReceived = recv(client_socket, buffer, buffer_size, 0);
     //if (bytesReceived > 0) {
@@ -155,7 +158,6 @@ void Server::handle_client(SOCKET client_socket, InvertedIndex& in_index, FileFi
 
         else if (action == "update") {
             std::string folder, num1_str, num2_str;
-
             if (iss >> num1_str && !is_number(num1_str)) {
                 folder = num1_str;
                 num1_str = "0";  // —тандартное значение, если это не число
@@ -174,8 +176,8 @@ void Server::handle_client(SOCKET client_socket, InvertedIndex& in_index, FileFi
             std::vector<std::string> folders{folder};
             
             std::vector<std::string> files = file_f.find_files(folders, num1, num2, num1, num2);
-            in_index.create_index(files);
-            std::string response = "Update done";
+            in_index.create_index1(files, q_index);
+            std::string response = "Update is being carried out \n";
             send(client_socket, response.c_str(), response.length(), 0);
         }
 

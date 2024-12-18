@@ -13,6 +13,14 @@ void InvertedIndex::create_index(std::vector<std::string> files) {
         [this](const std::string& path) { add_index_1file(path); });
 }
 
+void InvertedIndex::create_index1(std::vector<std::string> files, MyQueue& q) {
+    for (const auto& file : files) {
+        Task t(file, [this](std::string file) { this->add_index_1file(file); });
+        q.push(t);
+    }
+}
+
+
 void InvertedIndex::add_index_1file(const std::string& path) {
     std::ifstream file(path);
    // std::cout << path << std::endl;
@@ -69,7 +77,10 @@ void InvertedIndex::print_index() {
 
 
 std::vector<std::string> InvertedIndex::find_index(std::string word) {
-    return hm[word];
+    hm_mutex.lock();
+    std::vector<std::string> res = hm[word];
+    hm_mutex.unlock();
+    return res;
 }
 
 void InvertedIndex::update_index(std::vector<std::string> files) {

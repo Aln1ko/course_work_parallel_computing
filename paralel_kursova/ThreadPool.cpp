@@ -15,11 +15,12 @@ void ThreadPool::consume()
 {
 	while (true) {
 		std::mutex& m = queue.get_mut();
+		//std::cout << queue.size() << std::endl;
 		std::unique_lock<std::mutex> lock(m);
-		while ((queue.empty() || paused) && !finished) {
+		while ((queue.empty() || paused) && !finished && !working_to_the_end) {
 			queue.con_var.wait(lock);
 		}
-		if (finished) return;
+		if (finished || (queue.empty() && working_to_the_end)) return;
 		Task t = queue.front_and_pop();
 		lock.unlock();
 		t.execute();
@@ -46,9 +47,28 @@ void ThreadPool::finish() {
 	queue.con_var.notify_all();
 }
 
+void ThreadPool::working_to_the_end_finish() {
+	std::lock_guard<std::mutex> lock(m_status);
+	working_to_the_end = true;
+	queue.con_var.notify_all();
+	
+}
+
+int ThreadPool::get_size_q() { 
+	std::mutex& m = queue.get_mut(); 
+	std::unique_lock<std::mutex> lock(m);
+	int res = queue.size();
+	lock.unlock();
+	return res;
+}
+
 ThreadPool::~ThreadPool()
 {
+	finish();
 	for (int i = 0; i < num_consumers; i++) {
-		consumer_threads[i].join();
+		if (consumer_threads[i].joinable()) 
+		{
+			consumer_threads[i].join();
+		}
 	}
 }

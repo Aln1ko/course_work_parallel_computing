@@ -3,6 +3,7 @@
 #include "FileFinder.h"
 #include "server.h"
 #include "ThreadPool.h"
+#include "MyQueue.h"
 #include <chrono>
 
 
@@ -21,7 +22,8 @@ int main()
 		"D:\\sasha\\4-course\\data\\t2"};
 	int start_index = 0;
 	int finish_index = 10;*/
-	
+
+
 	auto start_time = std::chrono::high_resolution_clock::now();
 
 	FileFinder file_f;
@@ -33,9 +35,18 @@ int main()
 
 	start_time = std::chrono::high_resolution_clock::now();
 
-	InvertedIndex in_index;
-	in_index.create_index(files);
+	MyQueue q_for_index;
+	ThreadPool tp_index(4, q_for_index);
+	tp_index.inizialize();
 
+	InvertedIndex in_index;
+	in_index.create_index1(files, q_for_index);
+	while (tp_index.get_size_q() != 0) {
+
+	}
+	/*tp_index.working_to_the_end_finish();
+	tp_index.finish();*/
+	
 	end_time = std::chrono::high_resolution_clock::now();
 	duration = end_time - start_time;
 	std::cout << "Time execution: " << duration.count() << " seconds" << std::endl;
@@ -44,7 +55,7 @@ int main()
 	ThreadPool tp(4,q);
 	tp.inizialize();
 	Server s = Server(8080);
-	s.start(q, in_index, file_f);
+	s.start(q, in_index, file_f, q_for_index);
 	
 
 	return 0;
