@@ -149,6 +149,7 @@ void Server::handle_client(SOCKET client_socket, InvertedIndex& in_index, FileFi
             std::cout << "answer2 is " << answer.c_str() << std::endl;
             std::cout << "sizeof buffer: " << sizeof(answer.c_str()) <<"  "<<answer.length() << std::endl;
             */
+            answer += "\n";
             send(client_socket, answer.c_str(),answer.length(),0);
         }
 
@@ -171,7 +172,7 @@ void Server::handle_client(SOCKET client_socket, InvertedIndex& in_index, FileFi
             int num1 = std::stoi(num1_str);
             int num2 = std::stoi(num2_str);
             std::vector<std::string> folders{folder};
-         
+            
             std::vector<std::string> files = file_f.find_files(folders, num1, num2, num1, num2);
             in_index.create_index(files);
             std::string response = "Update done";
