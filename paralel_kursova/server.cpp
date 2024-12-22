@@ -46,7 +46,7 @@ Server::Server(int port) : port(port) {
     std::cout << "Waiting for connection on port " << port << "..." << std::endl;
 }
 
-void Server::start(MyQueue& q, InvertedIndex& in_index, FileFinder& file_f, MyQueue& q_index)
+void Server::start(MyQueue& q, InvertedIndex& in_index, FileFinder& file_f)
 {
     while (true) {
         SOCKET client_socket;
@@ -58,12 +58,13 @@ void Server::start(MyQueue& q, InvertedIndex& in_index, FileFinder& file_f, MyQu
             std::cerr << "Error accepting client: " << WSAGetLastError() << std::endl;
             continue;
         }
-        std::cout << "Client connected: " << inet_ntoa(client_addr.sin_addr)
-            << ":" << ntohs(client_addr.sin_port) << std::endl;
+
+        /*std::cout << "Client connected: " << inet_ntoa(client_addr.sin_addr)
+            << ":" << ntohs(client_addr.sin_port) << std::endl;*/
 
         //Task t(client_socket, [this,&in_index,&file_f](SOCKET soc) {this->handle_client(soc, in_index,file_f); });
         std::string str = std::to_string(client_socket);
-        Task t(str, [this, &in_index, &file_f,&q_index](std::string str) {this->handle_client(str, in_index, file_f, q_index); });
+        Task t(str, [this, &in_index, &file_f,&q](std::string str) {this->handle_client(str, in_index, file_f, q); });
         q.push(t);
     }
 }
@@ -79,7 +80,7 @@ bool is_number(const std::string& str) {
     return std::all_of(str.begin() + start, str.end(), ::isdigit);
 }
 
-void Server::handle_client(std::string str, InvertedIndex& in_index, FileFinder& file_f, MyQueue& q_index)
+void Server::handle_client(std::string str, InvertedIndex& in_index, FileFinder& file_f, MyQueue& q)
 {
     int client_socket = stoi(str);
     char buffer[2048] = { 0 };
@@ -110,7 +111,8 @@ void Server::handle_client(std::string str, InvertedIndex& in_index, FileFinder&
         int bytes_recv = recv(client_socket, buffer, sizeof(buffer) - 1, 0);
         if (bytes_recv == 0) {
             // Клиент закрыл соединение
-            std::cout << "Client disconnected." << std::endl;
+
+            //std::cout << "Client disconnected." << std::endl;
             break;
         }
         if (bytes_recv == SOCKET_ERROR) {
@@ -119,7 +121,8 @@ void Server::handle_client(std::string str, InvertedIndex& in_index, FileFinder&
         }
         if (bytes_recv > 0) {
             buffer[bytes_recv] = '\0';
-            std::cout << "Запрос клиента: " << buffer << std::endl;
+
+            //std::cout << "Запрос клиента: " << buffer << std::endl;
         }
 
         std::string buffer_str(buffer);
@@ -136,7 +139,7 @@ void Server::handle_client(std::string str, InvertedIndex& in_index, FileFinder&
         else if (action == "find") {
             std::string word;
             iss >> word;
-            std::cout << "word is " << word << std::endl;
+           // std::cout << "word is " << word << std::endl;
             std::transform(word.begin(), word.end(), word.begin(), 
                 [](unsigned char c) {return std::tolower(c);});
 
@@ -176,7 +179,7 @@ void Server::handle_client(std::string str, InvertedIndex& in_index, FileFinder&
             std::vector<std::string> folders{folder};
             
             std::vector<std::string> files = file_f.find_files(folders, num1, num2, num1, num2);
-            in_index.create_index1(files, q_index);
+            in_index.create_index1(files, q);
             std::string response = "Update is being carried out \n";
             send(client_socket, response.c_str(), response.length(), 0);
         }

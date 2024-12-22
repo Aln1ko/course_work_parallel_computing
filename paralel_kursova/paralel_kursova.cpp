@@ -35,12 +35,12 @@ int main()
 
 	start_time = std::chrono::high_resolution_clock::now();
 
-	MyQueue q_for_index;
-	ThreadPool tp_index(4, q_for_index);
+	MyQueue q;
+	ThreadPool tp_index(1000, q);
 	tp_index.inizialize();
 
 	InvertedIndex in_index;
-	in_index.create_index1(files, q_for_index);
+	in_index.create_index1(files, q);
 	while (tp_index.get_size_q() != 0) {
 
 	}
@@ -51,11 +51,11 @@ int main()
 	duration = end_time - start_time;
 	std::cout << "Time execution: " << duration.count() << " seconds" << std::endl;
 
-	MyQueue q;
-	ThreadPool tp(4,q);
-	tp.inizialize();
+	/*MyQueue q;
+	ThreadPool tp(4,q);*/
+	//tp.inizialize();
 	Server s = Server(8080);
-	s.start(q, in_index, file_f, q_for_index);
+	s.start(q, in_index, file_f);
 	
 
 	return 0;

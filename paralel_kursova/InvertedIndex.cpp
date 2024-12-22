@@ -6,6 +6,7 @@
 #include <regex>
 
 
+
 InvertedIndex::InvertedIndex() {}
 
 void InvertedIndex::create_index(std::vector<std::string> files) {
@@ -77,9 +78,9 @@ void InvertedIndex::print_index() {
 
 
 std::vector<std::string> InvertedIndex::find_index(std::string word) {
-    hm_mutex.lock();
+    hm_mutex.lock_shared();
     std::vector<std::string> res = hm[word];
-    hm_mutex.unlock();
+    hm_mutex.unlock_shared();
     return res;
 }
 

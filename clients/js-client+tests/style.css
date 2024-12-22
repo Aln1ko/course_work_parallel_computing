@@ -1,0 +1,21 @@
+.container {
+    display:flex;
+    align-items: center;
+    gap:10px;
+}
+
+#input_group  {
+    display: none;
+}
+
+#input_group2 {
+    display: none;
+}
+
+#input2{
+    width: 100px;
+}
+
+#input3{
+    width: 100px;
+}

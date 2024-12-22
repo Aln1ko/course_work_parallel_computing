@@ -6,12 +6,13 @@
 #include <mutex>
 #include <iostream>
 #include "MyQueue.h"
+#include <shared_mutex>
 
 class InvertedIndex
 {
 	std::unordered_map<std::string, std::vector<std::string>> hm;
 	std::vector<std::string> words;
-	std::mutex hm_mutex;
+	std::shared_mutex hm_mutex;
 
 public:
 	InvertedIndex();
