@@ -1,5 +1,4 @@
-﻿
-#include "InvertedIndex.h"
+﻿#include "InvertedIndex.h"
 #include "FileFinder.h"
 #include "server.h"
 #include "ThreadPool.h"
@@ -36,14 +35,12 @@ int main()
 	start_time = std::chrono::high_resolution_clock::now();
 
 	MyQueue q;
-	ThreadPool tp_index(1000, q);
+	ThreadPool tp_index(100, q);
 	tp_index.inizialize();
 
 	InvertedIndex in_index;
 	in_index.create_index1(files, q);
-	while (tp_index.get_size_q() != 0) {
-
-	}
+	while (tp_index.get_size_q() != 0) {}
 	/*tp_index.working_to_the_end_finish();
 	tp_index.finish();*/
 	

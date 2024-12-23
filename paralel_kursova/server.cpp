@@ -59,8 +59,8 @@ void Server::start(MyQueue& q, InvertedIndex& in_index, FileFinder& file_f)
             continue;
         }
 
-        /*std::cout << "Client connected: " << inet_ntoa(client_addr.sin_addr)
-            << ":" << ntohs(client_addr.sin_port) << std::endl;*/
+        //std::cout << "Client connected: " << inet_ntoa(client_addr.sin_addr)
+        //    << ":" << ntohs(client_addr.sin_port) << std::endl;
 
         //Task t(client_socket, [this,&in_index,&file_f](SOCKET soc) {this->handle_client(soc, in_index,file_f); });
         std::string str = std::to_string(client_socket);
@@ -112,7 +112,7 @@ void Server::handle_client(std::string str, InvertedIndex& in_index, FileFinder&
         if (bytes_recv == 0) {
             // Клиент закрыл соединение
 
-            //std::cout << "Client disconnected." << std::endl;
+            std::cout << "Client disconnected." << std::endl;
             break;
         }
         if (bytes_recv == SOCKET_ERROR) {
@@ -122,7 +122,7 @@ void Server::handle_client(std::string str, InvertedIndex& in_index, FileFinder&
         if (bytes_recv > 0) {
             buffer[bytes_recv] = '\0';
 
-            //std::cout << "Запрос клиента: " << buffer << std::endl;
+   //         std::cout << "Запрос клиента: " << buffer << std::endl;
         }
 
         std::string buffer_str(buffer);
@@ -132,7 +132,7 @@ void Server::handle_client(std::string str, InvertedIndex& in_index, FileFinder&
         //std::cout << "action is " << action << std::endl;
         
         if (action == "quit") {
-            std::cout << "Quit command received, end of connection" << std::endl;
+            std::cout << "Quit command received, end of connection\n" << std::endl;
             break;
         }
 
@@ -185,7 +185,7 @@ void Server::handle_client(std::string str, InvertedIndex& in_index, FileFinder&
         }
 
         else {
-            std::string response = "Unknowen command";
+            std::string response = "Unknowen command\n";
             send(client_socket, response.c_str(), sizeof(response), 0);
         }
 

@@ -1,7 +1,6 @@
 #include "InvertedIndex.h"
 #include <sstream>
 #include <fstream>
-#include <set>
 #include <execution>
 #include <regex>
 
@@ -60,6 +59,7 @@ void InvertedIndex::add_index_1file(const std::string& path) {
     hm_mutex.lock();
     for (const std::string& word : set_words) {
         hm[word].push_back(path);
+        words.insert(word);
     }
     hm_mutex.unlock();
 }
@@ -89,7 +89,7 @@ void InvertedIndex::update_index(std::vector<std::string> files) {
 }
 
 
-std::vector<std::string> InvertedIndex::get_words() {
+std::set<std::string> InvertedIndex::get_words() {
     return words; 
 }
 

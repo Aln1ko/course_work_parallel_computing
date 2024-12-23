@@ -6,8 +6,9 @@
 
 class MyQueue {
 	std::queue<Task> q;
-	std::mutex mtx;
+	
 public:
+	std::mutex mtx;
 	std::condition_variable con_var;
 
 	void push(Task t) {
@@ -26,11 +27,11 @@ public:
 	bool empty() {
 		return q.empty();
 	}
-	std::mutex& get_mut() {
-		return mtx;
-	}
+
+
 	size_t size() {
 		return q.size();
 	}
+
 
 };

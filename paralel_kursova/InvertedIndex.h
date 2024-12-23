@@ -6,12 +6,13 @@
 #include <mutex>
 #include <iostream>
 #include "MyQueue.h"
+#include <set>
 #include <shared_mutex>
 
 class InvertedIndex
 {
 	std::unordered_map<std::string, std::vector<std::string>> hm;
-	std::vector<std::string> words;
+	std::set<std::string> words;
 	std::shared_mutex hm_mutex;
 
 public:
@@ -24,7 +25,7 @@ public:
 	void update_index(std::vector<std::string> files);
 	std::vector<std::string> find_index(std::string word);
 
-	std::vector<std::string> get_words();
+	std::set<std::string> get_words();
 	void print_index();
 	~InvertedIndex() ;
 };

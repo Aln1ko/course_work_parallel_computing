@@ -14,7 +14,7 @@ void ThreadPool::inizialize() {
 void ThreadPool::consume()
 {
 	while (true) {
-		std::mutex& m = queue.get_mut();
+		std::mutex & m = queue.mtx;
 		//std::cout << queue.size() << std::endl;
 		std::unique_lock<std::mutex> lock(m);
 		while ((queue.empty() || paused) && !finished && !working_to_the_end) {
@@ -55,7 +55,7 @@ void ThreadPool::working_to_the_end_finish() {
 }
 
 int ThreadPool::get_size_q() { 
-	std::mutex& m = queue.get_mut(); 
+	std::mutex& m = queue.mtx; 
 	std::unique_lock<std::mutex> lock(m);
 	int res = queue.size();
 	lock.unlock();
